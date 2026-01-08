@@ -1,14 +1,17 @@
-import React from 'react';
+import { notFound } from 'next/navigation';
 import Header from '@/app/components/header';
 
-export interface PageProps {
-  params: { id: string };
+interface PageProps {
+    params: Promise<{ id: string }>;
 }
 
-export default function Page({ params }: PageProps) {
-  return (
-    <>
-      <Header>Company ({params.id})</Header>
-    </>
-  );
+export default async function Page({ params }: PageProps) {
+    const { id } = await params;
+    const companyId = Number(id);
+    
+    if (!Number.isInteger(companyId)) {
+        notFound();
+    }
+    
+    return <Header>Company ({companyId})</Header>;
 }
