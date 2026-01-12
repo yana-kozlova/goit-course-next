@@ -54,14 +54,6 @@ export interface Promotion {
   avatar?: string;
 }
 
-const PROJECT_TOKEN = process.env.NEXT_PUBLIC_PROJECT_TOKEN;
-
-const buildUrl = (...paths: string[]) =>
-  `https://${PROJECT_TOKEN}.mockapi.io/api/v1/${paths.join('/')}`;
-
-const stringifyQueryParams = (params: Record<string, string>) =>
-  new URLSearchParams(params).toString();
-
 const sendRequest = async <T>(url: string, init?: RequestInit) => {
   const res = await fetch(url, init);
   if (!res.ok) {
@@ -72,67 +64,68 @@ const sendRequest = async <T>(url: string, init?: RequestInit) => {
 };
 
 export const getSummaryStats = (init?: RequestInit) => {
-  return sendRequest<SummaryStats>(buildUrl('summary-stats', '1'), init);
+  return sendRequest<SummaryStats>('/api/summary-stats', init);
 };
 
 export const getSummarySales = (init?: RequestInit) => {
-  return sendRequest<SummarySales[]>(buildUrl('summary-sales'), init);
+  return sendRequest<SummarySales[]>('/api/summary-sales', init);
 };
 
 export const getCountries = (init?: RequestInit) => {
-  return sendRequest<Country[]>(buildUrl('countries'), init);
+  return sendRequest<Country[]>('/api/countries', init);
 };
 
 export const getCategories = (init?: RequestInit) => {
-  return sendRequest<Category[]>(buildUrl('categories'), init);
+  return sendRequest<Category[]>('/api/categories', init);
 };
 
 export const getCompanies = (init?: RequestInit) => {
-  return sendRequest<Company[]>(buildUrl('companies'), init);
+  return sendRequest<Company[]>('/api/companies', init);
 };
 
 export const getCompany = (id: string, init?: RequestInit) => {
-  return sendRequest<Company>(buildUrl('companies', id), init);
+  return sendRequest<Company>(`/api/companies/${id}`, init);
 };
 
 export const getPromotions = async (
   params: Record<string, string> = {},
   init?: RequestInit,
 ) => {
-  return sendRequest<Promotion[]>(
-    `${buildUrl('promotions')}?${stringifyQueryParams(params)}`,
-    init,
-  );
+  const queryParams = new URLSearchParams(params).toString();
+  const url = queryParams
+    ? `/api/promotions?${queryParams}`
+    : '/api/promotions';
+  return sendRequest<Promotion[]>(url, init);
 };
 
 export const createCompany = async (
-    data: Omit<Company, 'id' | 'hasPromotions'>
+  data: Omit<Company, 'id' | 'hasPromotions'>,
 ): Promise<Company> => {
   const res = await fetch('/api/companies', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  
+
   if (!res.ok) {
     throw new Error('Failed to create company');
   }
-  
+
   return res.json();
 };
 
 export const createPromotion = async (
-    data: Omit<Promotion, 'id'>
+  data: Omit<Promotion, 'id'>,
 ): Promise<Promotion> => {
   const res = await fetch('/api/promotions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  
+
   if (!res.ok) {
     throw new Error('Failed to create promotion');
   }
-  
+
   return res.json();
 };
