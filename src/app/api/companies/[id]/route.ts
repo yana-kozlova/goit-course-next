@@ -9,6 +9,15 @@ export async function GET(
   try {
     const { id } = await params;
 
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
+      console.error('Invalid UUID format:', id);
+      return NextResponse.json({ error: 'Invalid company ID format' }, { status: 400 });
+    }
+
+    console.log('Fetching company with ID:', id);
+
     const company = await sql`
       SELECT 
         c.id,
@@ -30,7 +39,10 @@ export async function GET(
       WHERE c.id = ${id}
     `;
 
+    console.log('Company query result:', company.length, 'rows found');
+
     if (company.length === 0) {
+      console.error('Company not found for ID:', id);
       return NextResponse.json({ error: 'Company not found' }, { status: 404 });
     }
 

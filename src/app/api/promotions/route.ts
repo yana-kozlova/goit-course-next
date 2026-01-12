@@ -9,6 +9,15 @@ export async function GET(request: NextRequest) {
 
     let promotions;
     if (companyId) {
+      // Validate UUID format
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(companyId)) {
+        return NextResponse.json(
+          { error: 'Invalid company ID format' },
+          { status: 400 },
+        );
+      }
+
       promotions = await sql`
         SELECT 
           p.id,
