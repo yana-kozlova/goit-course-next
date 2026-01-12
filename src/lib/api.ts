@@ -104,3 +104,35 @@ export const getPromotions = async (
     init,
   );
 };
+
+export const createCompany = async (
+    data: Omit<Company, 'id' | 'hasPromotions'>
+): Promise<Company> => {
+  const res = await fetch('/api/companies', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  
+  if (!res.ok) {
+    throw new Error('Failed to create company');
+  }
+  
+  return res.json();
+};
+
+export const createPromotion = async (
+    data: Omit<Promotion, 'id'>
+): Promise<Promotion> => {
+  const res = await fetch('/api/promotions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  
+  if (!res.ok) {
+    throw new Error('Failed to create promotion');
+  }
+  
+  return res.json();
+};
